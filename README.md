@@ -29,8 +29,9 @@ leaving the tool, `fastbuilduix` wraps that same engine.
 | Set up `arduino-cli`, board cores, and drivers from scratch | [`fastbuilduix/INSTALL_GUIDE.md`](fastbuilduix/INSTALL_GUIDE.md) |
 | Learn to use the desktop UI | [`fastbuilduix/HOW_TO_GUIDE.md`](fastbuilduix/HOW_TO_GUIDE.md) |
 | Understand how the UI is built, tab by tab | [`fastbuilduix/README.md`](fastbuilduix/README.md) |
-| Use `fastbuild` directly from the command line | [`fastbuild/README.md`](fastbuild/README.md) |
-| Contribute to `fastbuild` itself | [`fastbuild/CONTRIBUTING.md`](fastbuild/CONTRIBUTING.md) |
+| Use `fastbuild` directly from the command line | [`fastbuild-tool/README.md`](fastbuild-tool/README.md) |
+| Contribute to `fastbuild` itself | [`fastbuild-tool/CONTRIBUTING.md`](fastbuild-tool/CONTRIBUTING.md) |
+| Build either one from source | See "Building from source" below |
 
 If you're new here and just want a working setup as quickly as possible:
 start with the install guide, then the UI how-to guide. Both assume no
@@ -45,10 +46,57 @@ want to try `fastbuild` directly without the UI:
 fastbuild path/to/your.config
 ```
 
-See `fastbuild/README.md` for the config file format and every available
-flag - `-daemon`/`-connect` for a persistent build server, `-watch` for
-build-on-save, `-configure-board` for an interactive board picker, and more.
+See `fastbuild-tool/README.md` for the config file format and every
+available flag - `-daemon`/`-connect` for a persistent build server,
+`-watch` for build-on-save, `-configure-board` for an interactive board
+picker, and more.
+
+## Building from source
+
+Only needed if you're not just using prebuilt releases. The two halves
+have separate toolchains and can be built independently of each other.
+
+### Building `fastbuild` (the Go tool)
+
+- **Go 1.22.2 or later** - [go.dev/dl](https://go.dev/dl/). The exact
+  minimum is pinned in `fastbuild-tool/go.mod`.
+- From the `fastbuild-tool` folder, run `build.bat` (or `go build -o
+  fastbuild.exe .` directly) - no external dependencies, the standard
+  library only.
+
+**Optional: embedding the exe icon.** Go doesn't support embedding exe
+icons/resources natively, so this is a separate, one-time step, not part
+of the normal build:
+- **MinGW-w64** (provides `windres.exe`) -
+  [msys2.org](https://www.msys2.org/) is the simplest way to get it. After
+  installing, make sure its `bin` folder (containing `windres.exe`) is
+  added to your Windows PATH - `where windres` from a fresh Command Prompt
+  should find it if it's set up correctly.
+- Place your icon as `fastbuild-tool/fastbuild.ico`, then run
+  `add-icon.bat` once. This generates `rsrc_windows_amd64.syso` in that
+  same folder - `go build`/`build.bat` picks it up and embeds it
+  automatically from then on, no flags needed, and no need to re-run
+  `add-icon.bat` again unless the icon itself changes.
+- This step is entirely optional - `fastbuild.exe` builds and runs
+  identically without it, just without an icon of its own in Explorer.
+
+### Building `fastbuilduix` (the Java UI)
+
+- **Java 8 JDK** (source/target level 1.8) - [Eclipse
+  Temurin](https://adoptium.net/) is a good free, actively-maintained
+  source for this, since Oracle's own JDK 8 builds are no longer freely
+  distributed.
+- **NetBeans** (or any IDE that can import an Ant-based NetBeans project)
+  - [netbeans.apache.org](https://netbeans.apache.org/).
+- Open the `fastbuilduix` folder as a NetBeans project and run it
+  directly, or build from the command line:
+  ```
+  ant -f fastbuilduix jar
+  java -jar fastbuilduix/dist/fastbuilduix.jar
+  ```
+  See `fastbuilduix/README.md` for the full dependency list (bundled jars
+  under `fastbuilduix/src/lib/`) and project structure.
 
 ## License
 
-See [`fastbuild/LICENSE`](fastbuild/LICENSE).
+See [`fastbuild-tool/LICENSE`](fastbuild-tool/LICENSE).
