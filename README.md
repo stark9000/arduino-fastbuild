@@ -114,3 +114,10 @@ directly, not for normal use.
 ## License
 
 See [`fastbuild-tool/LICENSE`](fastbuild-tool/LICENSE).
+
+<img width="1536" height="1024" alt="fastbuild-post" src="https://github.com/user-attachments/assets/5c4ee323-5709-46b9-9eba-f47ac79c303b" />
+<img width="1364" height="728" alt="Screenshot_1" src="https://github.com/user-attachments/assets/f1cab46d-981c-4712-a456-ac800b1d633c" />
+<img width="1365" height="728" alt="Screenshot_2" src="https://github.com/user-attachments/assets/a5a76456-b8ed-422d-a39a-0631daaa5a15" />
+<img width="1365" height="728" alt="Screenshot_3" src="https://github.com/user-attachments/assets/d888f1ea-6323-47f8-a932-5a7beec46722" />
+<img width="1365" height="727" alt="Screenshot_4" src="https://github.com/user-attachments/assets/dc65d783-ea1b-499f-b1e9-f3c5ddf4d466" />
+
