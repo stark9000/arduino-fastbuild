@@ -32,6 +32,7 @@ leaving the tool, `fastbuilduix` wraps that same engine.
 | Use `fastbuild` directly from the command line | [`fastbuild-tool/README.md`](fastbuild-tool/README.md) |
 | Contribute to `fastbuild` itself | [`fastbuild-tool/CONTRIBUTING.md`](fastbuild-tool/CONTRIBUTING.md) |
 | Build either one from source | See "Building from source" below |
+| Wrap `fastbuilduix.jar` into a native `.exe` | [Wraptor](https://github.com/stark9000/wraptor) (separate, companion tool) |
 
 If you're new here and just want a working setup as quickly as possible:
 start with the install guide, then the UI how-to guide. Both assume no
@@ -96,6 +97,19 @@ of the normal build:
   ```
   See `fastbuilduix/README.md` for the full dependency list (bundled jars
   under `fastbuilduix/src/lib/`) and project structure.
+
+**Optional: wrapping the jar into a native `.exe`.** For a
+double-clickable Windows executable instead of `java -jar ...` -
+[Wraptor](https://github.com/stark9000/wraptor), a companion tool: a small
+Java Swing GUI that patches a real icon, version info, and JRE-version
+enforcement directly into a native launcher stub around your jar - no
+Electron, no bundled 200MB runtime, just the jar plus a small native
+launcher. Point it at `fastbuilduix.jar` (Wraptor auto-detects the main
+jar and main class from the manifest), set an icon/version info if you
+want them, and build. Only needs a JRE to run Wraptor itself and produce
+the `.exe` - its own native launcher stub is prebuilt and only needs
+rebuilding (via MSYS2/MinGW-w64) if you're modifying Wraptor's C source
+directly, not for normal use.
 
 ## License
 
