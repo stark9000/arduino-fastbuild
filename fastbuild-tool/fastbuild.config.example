@@ -1,0 +1,153 @@
+# fastbuild config file.
+#
+# Copy this to something like neopixel_scroll_text.config per project/board and fill
+# in the values. Lines starting with # are comments.
+#
+# Prefer a GUI? `fastbuild -gui` edits and saves this exact same format - nothing
+# here is command-line-only.
+
+# Full path to the arduino-cli.yaml config, and to the arduino-cli executable.
+configFile=C:/Path/To/arduinoCLI/arduino-cli.yaml
+arduinoCLI=C:/Path/To/arduinoCLI/arduino-cli.exe
+
+# Full path to the .ino sketch file.
+sketch=C:/Path/To/YourSketch/YourSketch.ino
+
+# Fully qualified board name (copy from a verbose IDE build - board definitions can
+# change between core versions, so always confirm against a fresh Verify output rather
+# than reusing an old one). Works for any board, not just ESP8266 - fastbuild only
+# ever splits this on ":" to get package:arch generically.
+fqbn=esp8266:esp8266:nodemcu:xtal=80,vt=flash,exception=disabled,stacksmash=disabled,ssl=all,mmu=3232,non32xfer=fast,eesz=4M2M,ip=lm2f,dbg=Disabled,lvl=None____,wipe=none,baud=115200
+
+# Base folder where fastbuild keeps its persistent per-project build/cache folders.
+# Everything under here survives across builds - this is the fix for the "temp folder
+# gets a new random name every build" problem. It's also where the cached library
+# header index lives (one file per platform: header-index-<package>_<arch>.json).
+cacheRoot=C:/Users/YourName/.arduino-fastbuild
+
+# Optional extra build properties, "|"-delimited key=value pairs, each becomes its own
+# --build-property flag. Leave blank if not needed.
+buildProps=
+
+# Pass --verbose through to arduino-cli, so it prints per-file compile/reuse lines
+# (e.g. "Using previously compiled file" vs actually compiling) instead of just the
+# final summary. It also makes fastbuild itself print whether it reused, rebuilt, or
+# prompted about the cached library header index on this run. Set to false for
+# quieter output once you trust the cache behavior.
+verbose=true
+
+# --- Dependency-aware hashing (requires configFile to be set above) ---
+
+# hashLibraryHeaders: scan the sketch's #include graph and fold in the content of
+# every library/core header it resolves to, so editing a library file (not just the
+# sketch itself) correctly triggers a recompile. Default true.
+hashLibraryHeaders=true
+
+# hashToolchain: fold the installed compiler/toolchain version into the cache key, so
+# an arduino-cli core/toolchain update correctly triggers a recompile even though no
+# source file changed. Default true.
+hashToolchain=true
+
+# depsMode: how to detect library/header dependencies.
+#   regex    (default) scan #include lines - fast, needs nothing extra, but can't
+#            evaluate #ifdef/#ifndef so it may hash headers a build doesn't actually use
+#   depfile  read the compiler's own generated .d dependency file - more precise,
+#            correctly handles conditional includes, but needs one successful compile
+#            first to "bootstrap" before it has any data to use
+# "gcc" is accepted as a permanent alias for "depfile" - same thing, older name.
+depsMode=regex
+
+# platformVersion: pin an exact installed platform version (e.g. "3.0.2") instead of
+# auto-selecting the highest installed one - useful for a reproducible build if you
+# ever have multiple core versions installed side by side. Blank (default) auto-selects
+# the highest installed version for the FQBN's package:arch. Errors at load time if the
+# pinned version isn't actually installed, rather than silently falling back.
+platformVersion=
+
+# gccInjectMMD: only relevant when depsMode=depfile. depfile mode assumes arduino-cli's
+# own recipe already passes -MMD to the compiler (true for the standard
+# AVR/ESP8266/ESP32/SAMD cores) - if a particular board's .d file never appears on its
+# own, set this to true to have fastbuild add -MMD itself via build.extra_flags.
+# Default false.
+gccInjectMMD=false
+
+# depsIndexMaxAgeHours: how many hours a cached library header index can sit unchanged
+# before fastbuild treats it as "stale by age" and offers to rebuild it - a safety net
+# in case a change deep inside a library ever slips past normal change-detection.
+# Default 24 if unset. (regex mode only.)
+#
+# By default, when the cache goes stale by age, fastbuild ASKS on stdin before doing a
+# full rebuild - it never launches an unexpected directory walk mid-build on its own.
+# Answer the prompt, or use one of these flags to skip it entirely for a run:
+#   -skip-stale-deps-refresh   keep using the stale cache, no prompt, no delay
+#   -assume-yes-stale-deps     rebuild automatically, no prompt (handy for CI/scripts)
+#   -refresh-deps-index        force a rebuild right now regardless of age or signature
+#
+# Set this to 0 to disable the age check entirely - the cache then only ever rebuilds
+# when an actual library file is added, removed, or renamed.
+depsIndexMaxAgeHours=24
+
+# --- Build statistics ---
+
+# showStats: print a "FastBuild Statistics" summary after each run - dependency
+# source (regex/depfile), source and dependency file counts, hash time, and either
+# the compile time or "skipped (cache hit)" with an estimated time saved. Can also be
+# turned on per-invocation with -stats without editing this file. Default false.
+showStats=false
+
+# --- Logging ---
+
+# jsonOutput: emit fastbuild's own status lines as JSON Lines (one JSON object per
+# line) instead of plain text - for a script or GUI to parse reliably instead of
+# matching exact wording. arduino-cli's own compiler output stays plain-text
+# passthrough either way. Default false.
+jsonOutput=false
+
+# saveLog: save each run's output to a timestamped file, in whichever representation
+# (plain or JSON Lines) is active. Default false.
+saveLog=false
+
+# logDir: where saveLog writes to. Blank (default) uses <project>/logs.
+logDir=
+
+# --- Force / clean ---
+# Both of these are one-shot when running under -watch: only the first build of a
+# watch session honors them, so a long-running watch session doesn't wipe the cache
+# or force a full recompile on every single poll tick forever. A normal, non-watch
+# invocation is unaffected either way, since it only ever builds once.
+
+# force: bypass the skip-if-unchanged check and always ask arduino-cli to build.
+# arduino-cli's own per-file object cache still applies. Default false.
+force=false
+
+# clean: wipe the persistent build folder (and cached state) before building - a true
+# from-scratch rebuild, slower than force since arduino-cli's own object cache is gone
+# too. Default false.
+clean=false
+
+# --- Upload ---
+
+# upload: after building (or after a cache-hit skip), upload the resulting binary via
+# `arduino-cli upload --input-dir` - this does NOT trigger a recompile. Requires port
+# to be set. Default false.
+upload=false
+
+# port: serial port to upload to, e.g. COM3. Required if upload=true.
+port=
+
+# --- Export (copy compiled binary to the sketch folder) ---
+
+# export: copy the resulting binary into the sketch's own folder after building or
+# skipping - similar to the Arduino IDE's "Export Compiled Binary", but with conflict
+# handling arduino-cli's own --export-binaries doesn't have. Default false.
+export=false
+
+# exportConflict: what to do if the export destination already exists.
+#   ask       (default) prompt on a real terminal; auto-rename instead if stdin isn't
+#             genuinely interactive (e.g. a scheduled task, a service, a GUI launching
+#             fastbuild as a subprocess without wiring up stdin)
+#   overwrite replace the existing file unconditionally, no asking
+#   rename    always auto-rename (e.g. sketch.ino_1.bin), no asking, never touches
+#             what's already there
+# An unrecognized value here is a load-time error, not a silent fallback to "ask".
+exportConflict=ask
